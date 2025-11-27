@@ -1,8 +1,10 @@
 from fastapi import FastAPI
+from fastapi.requests import HTTPConnection
 from database import db as connection
 from database import *
 from schemas import *
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 app = FastAPI(title="Agenda de Contactos", 
               description="API para la gestión de contactos", 
@@ -30,6 +32,10 @@ def startup():
 def shutdown():
     if not connection.is_closed():
         connection.close()
+
+@app.get("/")
+async def home():
+    return {"message": "Bienvenido a la API de Agenda de Contactos"}
 
 #Funcion agregar
 @app.post('/api/v1/agregar', tags=['Contactos'])
@@ -60,4 +66,5 @@ def listaContactos():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
